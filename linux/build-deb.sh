@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${VERSION:-0.1.0}"
+VERSION="${VERSION:-0.1.2}"
 NAME="discord-drover-linux"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 STAGE="$ROOT/linux/pkg/${NAME}_${VERSION}"

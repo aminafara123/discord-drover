@@ -75,8 +75,8 @@ Proxy reachability: the launcher pings the configured proxy (2s) and falls back 
 - Tested with Mint 21/22 (Cinnamon, X11/Wayland). Voice should route over TCP/TURN when `DISABLE_NON_PROXIED_UDP=1`.
 
 ### Portable .deb with Tor defaults (recommended)
-- Build: `cd linux && VERSION=0.1.1 ./build-deb.sh`
-- Install on any Ubuntu/Debian machine: `sudo apt install ./pkg/discord-drover-linux_0.1.1.deb`
+- Build: `cd linux && VERSION=0.1.2 ./build-deb.sh`
+- Install on any Ubuntu/Debian machine: `sudo apt install ./pkg/discord-drover-linux_0.1.2.deb`
 - What it does: pulls `tor`, `torsocks`, `desktop-file-utils`, `zenity`, `python3-gi` + `ayatana` indicator deps, `python3-pil`, `libnotify-bin`; installs `discord-drover` to `/usr/local/bin`, desktop entries to `/usr/share/applications`, config to `/etc/discord-drover/config.env`.
 - Defaults: `PROXY_URL=socks5://127.0.0.1:9050` (Tor local SOCKS) and `DISABLE_NON_PROXIED_UDP=1`. Post-install enables/starts `tor@default` so the SOCKS proxy is ready for Discord.
 - Launch: open “Discord (Drover)” from your app menu or run `discord-drover`. Edit `/etc/discord-drover/config.env` if you need a different proxy.
