@@ -10,9 +10,11 @@ CONFIG_FILE="${DISCORD_DROVER_CONFIG:-/etc/discord-drover/config.env}"
 log() { printf '[drover] %s\n' "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
 
-if [[ -f "$CONFIG_FILE" ]]; then
+if [[ -r "$CONFIG_FILE" ]]; then
   # shellcheck disable=SC1090
   source "$CONFIG_FILE"
+else
+  log "Config not readable at $CONFIG_FILE (chmod 644 $CONFIG_FILE to fix)."
 fi
 
 PROXY_URL="${PROXY_URL:-}"
@@ -37,6 +39,16 @@ find_discord_cmd() {
 
   if [[ -x /usr/lib/discord/Discord ]]; then
     echo "/usr/lib/discord/Discord"
+    return 0
+  fi
+
+  if command -v flatpak >/dev/null 2>&1 && flatpak info com.discordapp.Discord >/dev/null 2>&1; then
+    echo "flatpak run com.discordapp.Discord"
+    return 0
+  fi
+
+  if [[ -x /opt/Discord/Discord ]]; then
+    echo "/opt/Discord/Discord"
     return 0
   fi
 

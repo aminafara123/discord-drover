@@ -62,6 +62,10 @@ discord-drover                  # launches Discord with proxy + forced TCP/TURN 
 
 Config defaults live at `linux/config.example.env`. The launcher auto-detects Discord from snap or .deb installs; override with `DISCORD_CMD=/path/to/Discord` if needed.
 
+Permissions: the installer makes `/etc/discord-drover/config.env` world-readable (no secrets stored there). If you copied configs manually and see “Permission denied,” run `sudo chmod 644 /etc/discord-drover/config.env`.
+
+Binary detection: supports snap, .deb (`discord`), flatpak (`flatpak run com.discordapp.Discord`), and common paths (`/usr/share/discord/Discord`, `/usr/lib/discord/Discord`, `/opt/Discord/Discord`). Use `DISCORD_CMD=... discord-drover` to force a path.
+
 ### Linux Mint 21/22
 - Use the same steps as Ubuntu. Mint is Ubuntu-based, so `sudo ./install.sh` or `sudo apt install ./pkg/discord-drover-linux_<ver>.deb` works out of the box.
 - Tested with Mint 21/22 (Cinnamon, X11/Wayland). Voice should route over TCP/TURN when `DISABLE_NON_PROXIED_UDP=1`.

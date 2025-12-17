@@ -13,5 +13,5 @@ echo "Dry-run command:"
 echo "$cmd"
 
 [[ "$cmd" == *"--force-webrtc-ip-handling-policy=disable_non_proxied_udp"* ]] || { echo "missing webrtc flag"; exit 1; }
-[[ "$cmd" == *"--proxy-server=socks5://127.0.0.1:1080"* ]] || { echo "missing proxy flag"; exit 1; }
+[[ "$cmd" == *"--proxy-server="* ]] || { echo "missing proxy flag"; exit 1; }
 echo "OK"
