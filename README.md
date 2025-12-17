@@ -78,6 +78,7 @@ Proxy reachability: the launcher pings the configured proxy (2s) and falls back 
 - What it does: pulls `tor`, `torsocks`, `desktop-file-utils`; installs `discord-drover` to `/usr/local/bin`, desktop entry to `/usr/share/applications`, config to `/etc/discord-drover/config.env`.
 - Defaults: `PROXY_URL=socks5://127.0.0.1:9050` (Tor local SOCKS) and `DISABLE_NON_PROXIED_UDP=1`. Post-install enables/starts `tor@default` so the SOCKS proxy is ready for Discord.
 - Launch: open “Discord (Drover)” from your app menu or run `discord-drover`. Edit `/etc/discord-drover/config.env` if you need a different proxy.
+- Optional fallback list: set `PROXY_CANDIDATES="socks5://127.0.0.1:9050 http://1.2.3.4:8080"` to try each in order when `PROXY_URL` is empty or unreachable. The first reachable proxy is chosen automatically; a desktop notification is sent if `notify-send` is available.
 
 ### Docker (for isolated runs)
 ```bash

@@ -9,6 +9,11 @@ CONFIG_FILE="${DISCORD_DROVER_CONFIG:-/etc/discord-drover/config.env}"
 
 log() { printf '[drover] %s\n' "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send "Discord Drover" "$*" >/dev/null 2>&1 || true
+  fi
+}
 
 if [[ -r "$CONFIG_FILE" ]]; then
   # shellcheck disable=SC1090
@@ -20,21 +25,45 @@ fi
 PROXY_URL="${PROXY_URL:-}"
 DISABLE_NON_PROXIED_UDP="${DISABLE_NON_PROXIED_UDP:-1}"
 EXTRA_FLAGS="${EXTRA_FLAGS:-}"
+PROXY_CANDIDATES="${PROXY_CANDIDATES:-}"
+
+check_proxy() {
+  local url="$1"
+  local hostport="${url#*://}"
+  hostport="${hostport#*@}" # strip auth if present
+  if [[ "$hostport" == *":"* ]]; then
+    local host="${hostport%:*}"
+    local port="${hostport##*:}"
+    if [[ -n "$host" && "$port" =~ ^[0-9]+$ ]]; then
+      timeout 2 bash -c "cat </dev/null >/dev/tcp/$host/$port" 2>/dev/null
+      return $?
+    fi
+  fi
+  return 1
+}
 
 # If a proxy is set, sanity-check reachability; fall back to direct if unreachable.
 if [[ -n "$PROXY_URL" && "${DISCORD_DROVER_SKIP_PROXY_CHECK:-0}" != "1" ]]; then
-  hostport="${PROXY_URL#*://}"
-  hostport="${hostport#*@}" # strip auth if present
-  if [[ "$hostport" == *":"* ]]; then
-    host="${hostport%:*}"
-    port="${hostport##*:}"
-    if [[ -n "$host" && "$port" =~ ^[0-9]+$ ]]; then
-      if ! timeout 2 bash -c "cat </dev/null >/dev/tcp/$host/$port" 2>/dev/null; then
-        log "Proxy unreachable ($PROXY_URL); falling back to direct mode."
-        PROXY_URL=""
-      fi
-    fi
+  if ! check_proxy "$PROXY_URL"; then
+    log "Proxy unreachable ($PROXY_URL); falling back to direct mode."
+    PROXY_URL=""
   fi
+fi
+
+if [[ -z "$PROXY_URL" && -n "$PROXY_CANDIDATES" && "${DISCORD_DROVER_SKIP_PROXY_CHECK:-0}" != "1" ]]; then
+  # Try candidates in order; pick the first reachable.
+  # shellcheck disable=SC2206
+  candidates=( $PROXY_CANDIDATES )
+  for candidate in "${candidates[@]}"; do
+    if check_proxy "$candidate"; then
+      PROXY_URL="$candidate"
+      log "Selected proxy from candidates: $PROXY_URL"
+      notify "Proxy set to $PROXY_URL"
+      break
+    else
+      log "Candidate proxy unreachable: $candidate"
+    fi
+  done
 fi
 
 find_discord_cmd() {
