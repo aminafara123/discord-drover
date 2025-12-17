@@ -45,3 +45,46 @@ proxy = http://127.0.0.1:1080
 - No drivers or system-level modifications are required.
 - Works locally at the process level, offering an alternative to global VPN solutions.
 - Supports Discord Canary and PTB versions in addition to the main version.
+
+## Linux port (Ubuntu 22.04 / Linux Mint 21/22)
+
+This repo now includes a Linux launcher that mirrors Drover’s intent by:
+- Forcing Discord through a configured HTTP/SOCKS5 proxy (`--proxy-server`).
+- Disabling non-proxied UDP for WebRTC so voice falls back to TCP/TURN (`--force-webrtc-ip-handling-policy=disable_non_proxied_udp` + `WEBRTC_DISABLE_NON_PROXIED_UDP=1`).
+
+### Quick start
+```bash
+cd linux
+sudo ./install.sh               # installs to /opt/discord-drover and /usr/local/bin/discord-drover
+sudo nano /etc/discord-drover/config.env  # set PROXY_URL=socks5://host:port or leave empty for direct mode
+discord-drover                  # launches Discord with proxy + forced TCP/TURN for voice
+```
+
+Config defaults live at `linux/config.example.env`. The launcher auto-detects Discord from snap or .deb installs; override with `DISCORD_CMD=/path/to/Discord` if needed.
+
+### Linux Mint 21/22
+- Use the same steps as Ubuntu. Mint is Ubuntu-based, so `sudo ./install.sh` or `sudo apt install ./pkg/discord-drover-linux_<ver>.deb` works out of the box.
+- Tested with Mint 21/22 (Cinnamon, X11/Wayland). Voice should route over TCP/TURN when `DISABLE_NON_PROXIED_UDP=1`.
+
+### Build a .deb
+```bash
+cd linux
+VERSION=0.1.0 ./build-deb.sh
+sudo apt install ./pkg/discord-drover-linux_0.1.0.deb
+```
+
+### Docker (for isolated runs)
+```bash
+cd linux
+docker build -t discord-drover-linux .
+docker run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host \
+  -v /dev/snd:/dev/snd --ipc=host \
+  -e PROXY_URL="socks5://host:port" \
+  discord-drover-linux
+```
+
+Note: containerized desktop audio/video may need additional PulseAudio/PipeWire mounts; use host networking for voice.
+
+### Tests
+- `linux/tests/dry-run.sh`: ensures required flags and proxy wiring are present.
+- `linux/tests/smoke.sh`: checks Discord is installed and launcher composes correctly.

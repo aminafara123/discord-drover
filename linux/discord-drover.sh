@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Lightweight launcher that forces Discord to use a proxy and disables
+# non-proxied UDP for WebRTC (pushes voice to TCP/TURN), mirroring the
+# Windows drover behavior for Linux.
+
+CONFIG_FILE="${DISCORD_DROVER_CONFIG:-/etc/discord-drover/config.env}"
+
+log() { printf '[drover] %s\n' "$*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+
+if [[ -f "$CONFIG_FILE" ]]; then
+  # shellcheck disable=SC1090
+  source "$CONFIG_FILE"
+fi
+
+PROXY_URL="${PROXY_URL:-}"
+DISABLE_NON_PROXIED_UDP="${DISABLE_NON_PROXIED_UDP:-1}"
+EXTRA_FLAGS="${EXTRA_FLAGS:-}"
+
+find_discord_cmd() {
+  if command -v snap >/dev/null 2>&1 && snap list discord >/dev/null 2>&1; then
+    echo "snap run discord"
+    return 0
+  fi
+
+  if command -v discord >/dev/null 2>&1; then
+    echo "discord"
+    return 0
+  fi
+
+  if [[ -x /usr/share/discord/Discord ]]; then
+    echo "/usr/share/discord/Discord"
+    return 0
+  fi
+
+  if [[ -x /usr/lib/discord/Discord ]]; then
+    echo "/usr/lib/discord/Discord"
+    return 0
+  fi
+
+  return 1
+}
+
+cmd=$(find_discord_cmd) || fail "Discord binary not found (install Discord or adjust DISCORD_CMD)."
+if [[ -n "${DISCORD_CMD:-}" ]]; then
+  cmd="$DISCORD_CMD"
+fi
+
+args=()
+
+if [[ -n "$PROXY_URL" ]]; then
+  args+=(--proxy-server="$PROXY_URL" --proxy-bypass-list="<-loopback>")
+  log "Proxy set to $PROXY_URL"
+else
+  log "Proxy not set; running in direct mode."
+fi
+
+if [[ "$DISABLE_NON_PROXIED_UDP" == "1" ]]; then
+  args+=(--force-webrtc-ip-handling-policy=disable_non_proxied_udp)
+  export WEBRTC_DISABLE_NON_PROXIED_UDP=1
+  log "Non-proxied UDP disabled; WebRTC forced to TCP/TURN."
+fi
+
+if [[ -n "$EXTRA_FLAGS" ]]; then
+  # Split EXTRA_FLAGS respecting spaces
+  # shellcheck disable=SC2206
+  extra=( $EXTRA_FLAGS )
+  args+=("${extra[@]}")
+fi
+
+args+=(--disable-features=WebRtcHideLocalIpsWithMdns)
+args+=(--no-sandbox)
+
+full_cmd=($cmd "${args[@]}" "$@")
+
+if [[ "${DISCORD_DROVER_DRY_RUN:-0}" == "1" ]]; then
+  printf '%s\n' "${full_cmd[@]}"
+  exit 0
+fi
+
+exec "${full_cmd[@]}"

@@ -82,3 +82,7 @@ modules/
 
 .idea/
 run.bat
+
+# Linux packaging artifacts
+linux/pkg/
+*.deb
