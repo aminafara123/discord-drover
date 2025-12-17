@@ -66,6 +66,8 @@ Permissions: the installer makes `/etc/discord-drover/config.env` world-readable
 
 Binary detection: supports snap, .deb (`discord`), flatpak (`flatpak run com.discordapp.Discord`), and common paths (`/usr/share/discord/Discord`, `/usr/lib/discord/Discord`, `/opt/Discord/Discord`). Use `DISCORD_CMD=... discord-drover` to force a path.
 
+Proxy reachability: the launcher pings the configured proxy (2s) and falls back to direct mode if unreachable. Set `DISCORD_DROVER_SKIP_PROXY_CHECK=1` to skip the check (not recommended unless you’re sure the proxy is up).
+
 ### Linux Mint 21/22
 - Use the same steps as Ubuntu. Mint is Ubuntu-based, so `sudo ./install.sh` or `sudo apt install ./pkg/discord-drover-linux_<ver>.deb` works out of the box.
 - Tested with Mint 21/22 (Cinnamon, X11/Wayland). Voice should route over TCP/TURN when `DISABLE_NON_PROXIED_UDP=1`.
@@ -96,3 +98,4 @@ Note: containerized desktop audio/video may need additional PulseAudio/PipeWire 
 ### Troubleshooting
 - `Permission denied` reading `/etc/discord-drover/config.env`: ensure it’s readable: `sudo chmod 644 /etc/discord-drover/config.env` (installer sets this by default).
 - `Discord binary not found`: run as your regular user (not sudo). If still failing, set `DISCORD_CMD` explicitly, e.g. `DISCORD_CMD="snap run discord" discord-drover` (snap), `DISCORD_CMD="flatpak run com.discordapp.Discord" discord-drover` (flatpak), or point to the binary path.
+- Stuck on “Starting” or `ERR_PROXY_CONNECTION_FAILED`: your proxy isn’t reachable. Either clear `PROXY_URL` or point it to a live proxy; the launcher will auto-fallback to direct mode if the proxy check fails. Set `DISCORD_DROVER_SKIP_PROXY_CHECK=1` to disable the preflight.

@@ -21,6 +21,22 @@ PROXY_URL="${PROXY_URL:-}"
 DISABLE_NON_PROXIED_UDP="${DISABLE_NON_PROXIED_UDP:-1}"
 EXTRA_FLAGS="${EXTRA_FLAGS:-}"
 
+# If a proxy is set, sanity-check reachability; fall back to direct if unreachable.
+if [[ -n "$PROXY_URL" && "${DISCORD_DROVER_SKIP_PROXY_CHECK:-0}" != "1" ]]; then
+  hostport="${PROXY_URL#*://}"
+  hostport="${hostport#*@}" # strip auth if present
+  if [[ "$hostport" == *":"* ]]; then
+    host="${hostport%:*}"
+    port="${hostport##*:}"
+    if [[ -n "$host" && "$port" =~ ^[0-9]+$ ]]; then
+      if ! timeout 2 bash -c "cat </dev/null >/dev/tcp/$host/$port" 2>/dev/null; then
+        log "Proxy unreachable ($PROXY_URL); falling back to direct mode."
+        PROXY_URL=""
+      fi
+    fi
+  fi
+fi
+
 find_discord_cmd() {
   if command -v snap >/dev/null 2>&1 && snap list discord >/dev/null 2>&1; then
     echo "snap run discord"
