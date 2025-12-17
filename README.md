@@ -92,3 +92,7 @@ Note: containerized desktop audio/video may need additional PulseAudio/PipeWire 
 ### Tests
 - `linux/tests/dry-run.sh`: ensures required flags and proxy wiring are present.
 - `linux/tests/smoke.sh`: checks Discord is installed and launcher composes correctly.
+
+### Troubleshooting
+- `Permission denied` reading `/etc/discord-drover/config.env`: ensure it’s readable: `sudo chmod 644 /etc/discord-drover/config.env` (installer sets this by default).
+- `Discord binary not found`: run as your regular user (not sudo). If still failing, set `DISCORD_CMD` explicitly, e.g. `DISCORD_CMD="snap run discord" discord-drover` (snap), `DISCORD_CMD="flatpak run com.discordapp.Discord" discord-drover` (flatpak), or point to the binary path.
