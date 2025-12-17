@@ -52,7 +52,7 @@ This repo now includes a Linux launcher that mirrors Drover’s intent by:
 - Forcing Discord through a configured HTTP/SOCKS5 proxy (`--proxy-server`).
 - Disabling non-proxied UDP for WebRTC so voice falls back to TCP/TURN (`--force-webrtc-ip-handling-policy=disable_non_proxied_udp` + `WEBRTC_DISABLE_NON_PROXIED_UDP=1`).
 
-### Quick start
+### Quick start (local install script)
 ```bash
 cd linux
 sudo ./install.sh               # installs to /opt/discord-drover and /usr/local/bin/discord-drover
@@ -72,12 +72,12 @@ Proxy reachability: the launcher pings the configured proxy (2s) and falls back 
 - Use the same steps as Ubuntu. Mint is Ubuntu-based, so `sudo ./install.sh` or `sudo apt install ./pkg/discord-drover-linux_<ver>.deb` works out of the box.
 - Tested with Mint 21/22 (Cinnamon, X11/Wayland). Voice should route over TCP/TURN when `DISABLE_NON_PROXIED_UDP=1`.
 
-### Build a .deb
-```bash
-cd linux
-VERSION=0.1.0 ./build-deb.sh
-sudo apt install ./pkg/discord-drover-linux_0.1.0.deb
-```
+### Portable .deb with Tor defaults (recommended)
+- Build: `cd linux && VERSION=0.1.1 ./build-deb.sh`
+- Install on any Ubuntu/Debian machine: `sudo apt install ./pkg/discord-drover-linux_0.1.1.deb`
+- What it does: pulls `tor`, `torsocks`, `desktop-file-utils`; installs `discord-drover` to `/usr/local/bin`, desktop entry to `/usr/share/applications`, config to `/etc/discord-drover/config.env`.
+- Defaults: `PROXY_URL=socks5://127.0.0.1:9050` (Tor local SOCKS) and `DISABLE_NON_PROXIED_UDP=1`. Post-install enables/starts `tor@default` so the SOCKS proxy is ready for Discord.
+- Launch: open “Discord (Drover)” from your app menu or run `discord-drover`. Edit `/etc/discord-drover/config.env` if you need a different proxy.
 
 ### Docker (for isolated runs)
 ```bash

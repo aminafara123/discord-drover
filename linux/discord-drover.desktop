@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Discord (Drover)
+StartupWMClass=discord
+Comment=Launch Discord via drover (Tor SOCKS proxy + UDP disabled)
+GenericName=Internet Messenger
+Exec=/usr/local/bin/discord-drover %U
+Icon=discord
+Type=Application
+Categories=Network;InstantMessaging;
+Path=/usr/bin
