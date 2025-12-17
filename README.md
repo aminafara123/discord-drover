@@ -58,6 +58,8 @@ cd linux
 sudo ./install.sh               # installs to /opt/discord-drover and /usr/local/bin/discord-drover
 sudo nano /etc/discord-drover/config.env  # set PROXY_URL=socks5://host:port or leave empty for direct mode
 discord-drover                  # launches Discord with proxy + forced TCP/TURN for voice
+discord-drover-select           # pops a picker (zenity) to choose proxy then launches Discord
+discord-drover-tray             # starts tray icon to switch proxies and launch Discord
 ```
 
 Config defaults live at `linux/config.example.env`. The launcher auto-detects Discord from snap or .deb installs; override with `DISCORD_CMD=/path/to/Discord` if needed.
@@ -75,9 +77,11 @@ Proxy reachability: the launcher pings the configured proxy (2s) and falls back 
 ### Portable .deb with Tor defaults (recommended)
 - Build: `cd linux && VERSION=0.1.1 ./build-deb.sh`
 - Install on any Ubuntu/Debian machine: `sudo apt install ./pkg/discord-drover-linux_0.1.1.deb`
-- What it does: pulls `tor`, `torsocks`, `desktop-file-utils`; installs `discord-drover` to `/usr/local/bin`, desktop entry to `/usr/share/applications`, config to `/etc/discord-drover/config.env`.
+- What it does: pulls `tor`, `torsocks`, `desktop-file-utils`, `zenity`, `python3-gi` + `ayatana` indicator deps, `python3-pil`, `libnotify-bin`; installs `discord-drover` to `/usr/local/bin`, desktop entries to `/usr/share/applications`, config to `/etc/discord-drover/config.env`.
 - Defaults: `PROXY_URL=socks5://127.0.0.1:9050` (Tor local SOCKS) and `DISABLE_NON_PROXIED_UDP=1`. Post-install enables/starts `tor@default` so the SOCKS proxy is ready for Discord.
 - Launch: open “Discord (Drover)” from your app menu or run `discord-drover`. Edit `/etc/discord-drover/config.env` if you need a different proxy.
+- Proxy picker: launch “Discord (Drover - Pick Proxy)” or run `discord-drover-select` to choose a proxy via GUI (zenity) before starting Discord.
+- Tray switcher: launch “Discord Drover Tray” or run `discord-drover-tray` to keep a tray icon that switches proxies on the fly and can launch Discord.
 - Optional fallback list: set `PROXY_CANDIDATES="socks5://127.0.0.1:9050 http://1.2.3.4:8080"` to try each in order when `PROXY_URL` is empty or unreachable. The first reachable proxy is chosen automatically; a desktop notification is sent if `notify-send` is available.
 
 ### Docker (for isolated runs)

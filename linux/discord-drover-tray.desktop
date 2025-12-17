@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Discord Drover Tray
+Comment=Tray icon to pick proxy and launch Discord via drover
+Exec=/usr/local/bin/discord-drover-tray
+Icon=network-workgroup
+Type=Application
+Categories=Network;Utility;
+X-GNOME-Autostart-enabled=false

@@ -6,6 +6,7 @@ set -euo pipefail
 # Windows drover behavior for Linux.
 
 CONFIG_FILE="${DISCORD_DROVER_CONFIG:-/etc/discord-drover/config.env}"
+OVERRIDE_FILE="${DISCORD_DROVER_OVERRIDE:-/tmp/discord-drover/proxy_override}"
 
 log() { printf '[drover] %s\n' "$*" >&2; }
 fail() { log "ERROR: $*"; exit 1; }
@@ -26,6 +27,20 @@ PROXY_URL="${PROXY_URL:-}"
 DISABLE_NON_PROXIED_UDP="${DISABLE_NON_PROXIED_UDP:-1}"
 EXTRA_FLAGS="${EXTRA_FLAGS:-}"
 PROXY_CANDIDATES="${PROXY_CANDIDATES:-}"
+mkdir -p "$(dirname "$OVERRIDE_FILE")"
+
+if [[ -f "$OVERRIDE_FILE" ]]; then
+  OVERRIDE_PROXY="$(head -n1 "$OVERRIDE_FILE" | tr -d '\r\n')"
+  if [[ "$OVERRIDE_PROXY" == "DIRECT" ]]; then
+    PROXY_URL=""
+    log "Override: direct mode"
+    notify "Proxy override: Direct"
+  elif [[ -n "$OVERRIDE_PROXY" ]]; then
+    PROXY_URL="$OVERRIDE_PROXY"
+    log "Override: $PROXY_URL"
+    notify "Proxy override: $PROXY_URL"
+  fi
+fi
 
 check_proxy() {
   local url="$1"

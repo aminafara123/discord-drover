@@ -3,6 +3,8 @@ set -euo pipefail
 
 PREFIX="/opt/discord-drover"
 BIN_LINK="/usr/local/bin/discord-drover"
+SELECT_LINK="/usr/local/bin/discord-drover-select"
+TRAY_LINK="/usr/local/bin/discord-drover-tray"
 CONFIG_DIR="/etc/discord-drover"
 DESKTOP_DIR="/usr/share/applications"
 
@@ -10,6 +12,8 @@ log() { printf '[install] %s\n' "$*"; }
 
 install -d "$PREFIX"
 install -m 755 "$(dirname "$0")/discord-drover.sh" "$PREFIX/discord-drover"
+install -m 755 "$(dirname "$0")/discord-drover-select.sh" "$PREFIX/discord-drover-select"
+install -m 755 "$(dirname "$0")/discord-drover-tray.py" "$PREFIX/discord-drover-tray"
 
 install -d "$CONFIG_DIR"
 if [[ ! -f "$CONFIG_DIR/config.env" ]]; then
@@ -21,10 +25,16 @@ fi
 chmod 644 "$CONFIG_DIR/config.env"
 
 ln -sf "$PREFIX/discord-drover" "$BIN_LINK"
+ln -sf "$PREFIX/discord-drover-select" "$SELECT_LINK"
+ln -sf "$PREFIX/discord-drover-tray" "$TRAY_LINK"
 log "Installed launcher at $BIN_LINK"
+log "Installed proxy picker at $SELECT_LINK"
+log "Installed tray at $TRAY_LINK"
 
 install -d "$DESKTOP_DIR"
 install -m 644 "$(dirname "$0")/discord-drover.desktop" "$DESKTOP_DIR/discord-drover.desktop"
+install -m 644 "$(dirname "$0")/discord-drover-select.desktop" "$DESKTOP_DIR/discord-drover-select.desktop"
+install -m 644 "$(dirname "$0")/discord-drover-tray.desktop" "$DESKTOP_DIR/discord-drover-tray.desktop"
 if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "$DESKTOP_DIR" >/dev/null 2>&1 || true
 fi

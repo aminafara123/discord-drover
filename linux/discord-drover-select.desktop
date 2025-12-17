@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Discord (Drover - Pick Proxy)
+StartupWMClass=discord
+Comment=Choose a proxy then launch Discord via drover
+GenericName=Internet Messenger
+Exec=/usr/local/bin/discord-drover-select %U
+Icon=discord
+Type=Application
+Categories=Network;InstantMessaging;
+Path=/usr/bin

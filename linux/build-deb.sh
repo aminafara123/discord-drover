@@ -15,9 +15,15 @@ mkdir -p \
   "$STAGE/etc/discord-drover"
 
 install -m 755 "$ROOT/linux/discord-drover.sh" "$STAGE/opt/discord-drover/discord-drover"
+install -m 755 "$ROOT/linux/discord-drover-select.sh" "$STAGE/opt/discord-drover/discord-drover-select"
+install -m 755 "$ROOT/linux/discord-drover-tray.py" "$STAGE/opt/discord-drover/discord-drover-tray"
 install -m 640 "$ROOT/linux/config.example.env" "$STAGE/etc/discord-drover/config.env"
 ln -sf /opt/discord-drover/discord-drover "$STAGE/usr/local/bin/discord-drover"
+ln -sf /opt/discord-drover/discord-drover-select "$STAGE/usr/local/bin/discord-drover-select"
+ln -sf /opt/discord-drover/discord-drover-tray "$STAGE/usr/local/bin/discord-drover-tray"
 install -m 644 "$ROOT/linux/discord-drover.desktop" "$STAGE/usr/share/applications/discord-drover.desktop"
+install -m 644 "$ROOT/linux/discord-drover-select.desktop" "$STAGE/usr/share/applications/discord-drover-select.desktop"
+install -m 644 "$ROOT/linux/discord-drover-tray.desktop" "$STAGE/usr/share/applications/discord-drover-tray.desktop"
 
 cat >"$STAGE/DEBIAN/control" <<EOF
 Package: ${NAME}
@@ -25,7 +31,7 @@ Version: ${VERSION}
 Section: utils
 Priority: optional
 Architecture: all
-Depends: bash, tor, torsocks, desktop-file-utils
+Depends: bash, tor, torsocks, desktop-file-utils, zenity, python3, python3-gi, gir1.2-ayatanaappindicator3-0.1, python3-pil, libnotify-bin
 Maintainer: aminafara123 <aminafara123@gmail.com>
 Description: Discord Drover for Linux - proxy + non-UDP WebRTC wrapper
 EOF
